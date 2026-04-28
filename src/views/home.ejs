@@ -3,9 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %>></title>
+    <title><%= title %></title>
+    <link rel="stylesheet" href="css/home.css"></link>
 </head>
-<body>
-    <h1><%= h1 %></h1>
+<body onload="start()">
+    <div class="main-container">
+        <nav class="dashboard">
+            <div class="dashboard-element">
+                <span>CPU</span>
+                <canvas id="cpuChart"></canvas>
+            </div>
+            <div class="dashboard-element">
+                <span>RAM</span>
+                <canvas id="ramChart"></canvas>
+            </div>
+            <div class="dashboard-element">
+                <span>GPU</span>
+                <canvas id="gpuChart"></canvas>
+            </div>
+            <div class="dashboard-element">
+                <span>Disk</span>
+                <canvas id="diskChart"></canvas>
+            </div>
+            <div class="dashboard-element">
+                <span>Ethernet</span>
+                <canvas id="bandChart"></canvas>
+            </div>
+        </nav>
+        
+        <main class="content">
+            <h1><%= greeting %></h1>
+        </main>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        const refreshDelay = parseInt("<%= delay %>") || 3000;;
+    </script>
+    <script src="js/home.js"></script>
 </body>
 </html>

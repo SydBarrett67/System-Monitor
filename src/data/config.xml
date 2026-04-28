@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <homePage>
+        <title>Home page - System Monitor</title>
+        <!-- <theme>dark</theme> -->
+        <msg>System Monitor</msg>
+    </homePage>
+
+    <systemSettings>
+        <delay>1500</delay>
+    </systemSettings>
+</configuration>

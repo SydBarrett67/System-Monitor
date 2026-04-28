@@ -1,0 +1,50 @@
+body {
+    font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    background-color: rgb(30,20,20);
+    color: rgb(240,240,230);
+    margin: 0;
+    overflow: hidden;
+}
+
+.main-container {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+}
+
+.dashboard {
+    height: 100%;
+    width: 15%;
+    background-color: rgba(200,200,200,0.1); 
+    border-right: 1px solid rgba(255,255,255,0.2);
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+}
+
+.dashboard-element {
+    height: 15vh;
+    padding: 15px 20px;
+    color: rgb(240,240,230);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.3s;
+    font-size: 0.9rem;
+}
+
+.dashboard-element:hover {
+    background-color: rgba(255,255,255,0.15);
+}
+
+.content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; 
+}
+
+h1 {
+    text-align: center;
+    margin-top: 50px;
+    letter-spacing: 1px;
+}
