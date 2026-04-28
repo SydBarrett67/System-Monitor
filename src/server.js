@@ -4,7 +4,7 @@ const { parseConfig, getLog, updateLogs } = require("./utils.js");
 
 const PORT = 3000;
 const app = express();
-let delay = 3000;
+let delay = 1000;
 
 // Middleware
 app.set('view engine', 'ejs');
@@ -37,7 +37,7 @@ app.get('/', async (req, res) => {
 
 // APIs
 app.get('/api/data', async (req, res) => {
-    console.log("Received req")
+    console.log("Received request")
     try {
         const data = await getLog();
         res.json(data);

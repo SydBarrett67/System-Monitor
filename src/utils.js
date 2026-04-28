@@ -6,6 +6,8 @@ const os = require("os-utils");
 const configPath = path.join(__dirname, "data", "config.xml");
 const logPath = path.join(__dirname, "data", "userLog.csv");
 
+const maxLogLines = 60;
+
 async function parseConfig() {
     try {
         const xmlData = (await fs.readFile(configPath, "utf-8")).trim();
@@ -47,21 +49,33 @@ async function getLog() {
     }   
 }
 
-function updateLogs() {
-    os.cpuUsage((v) => {
-        const cpuUsage = (v * 100).toFixed(2);
+async function updateLogs() {
+    os.cpuUsage(async (v) => {
+        const cpu = (v * 100).toFixed(2);
         const totalRam = os.totalmem();
         const freeRam = os.freemem();
-        const ramUsage = (((totalRam - freeRam) / totalRam) * 100).toFixed(2);
-
-        const timestamp = new Date().toISOString();
-        const logLine = `${timestamp},${cpuUsage},${ramUsage}\n`;
+        const ram = (((totalRam - freeRam) / totalRam) * 100).toFixed(2);
+        const logLine = `${new Date().toISOString()},${cpu},${ram}`;
 
         try {
-            fs.appendFile(logPath, logLine);
-            console.log("[Log] CPU: " + cpuUsage + "% | RAM: " + ramUsage + "%");
-        } catch (e) {
-            console.error("Errore scrittura file", e)
+            let lines = [];
+            try {
+                const data = await fs.readFile(logPath, "utf-8");
+                lines = data.trim().split("\n");
+            } catch (e) {
+            }
+
+            lines.push(logLine);
+
+            if (lines.length > maxLogLines) {
+                lines = lines.slice(-maxLogLines);
+            }
+
+            await fs.writeFile(logPath, lines.join("\n") + "\n");
+            
+            console.log(`[Log] Saved (CPU: ${cpu} | RAM: ${ram})`);
+        } catch (err) {
+            console.error("Errore gestione log:", err.message);
         }
     });
 }
