@@ -36,7 +36,7 @@ app.get('/', async (req, res) => {
 })
 
 // APIs
-app.get('/api/data', async (req, res) => {
+app.get('/api/getData', async (req, res) => {
     console.log("Received request")
     try {
         const data = await getLog();
@@ -44,7 +44,9 @@ app.get('/api/data', async (req, res) => {
     } catch (e) {
         console.log("Errore API " + e.message)
     }    
-}) 
+})
+
+
 
 
 // Loop per ottenere i dati dal sistema

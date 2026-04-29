@@ -7,6 +7,6 @@
     </homePage>
 
     <systemSettings>
-        <delay>1500</delay>
+        <delay>1000</delay>
     </systemSettings>
 </configuration>

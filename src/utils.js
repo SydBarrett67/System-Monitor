@@ -2,6 +2,7 @@ const fs = require("fs").promises;
 const xml2js = require("xml2js");
 const path = require("path");
 const os = require("os-utils");
+const si = require("systeminformation");
 
 const configPath = path.join(__dirname, "data", "config.xml");
 const logPath = path.join(__dirname, "data", "userLog.csv");
@@ -32,16 +33,22 @@ async function getLog() {
 
         timestamps = []
         cpuHist = []
+        cpuTempHist = []
         ramHist = []
+        gpuHist = []
+        gpuTempHist = []
 
         last.forEach(line => {
-            const [time, cpu, ram] = line.split(",");
+            const [time, cpu, cpuTemp, ram, gpuLoad, gpuTemp] = line.split(",");
             timestamps.push(time);
             cpuHist.push(parseFloat(cpu));
+            cpuTempHist.push(parseFloat(cpuTemp));
             ramHist.push(parseFloat(ram));
+            gpuHist.push(parseFloat(gpuLoad));
+            gpuTempHist.push(parseFloat(gpuTemp));
         });
 
-        return { timestamps, cpuHist, ramHist };
+        return { timestamps, cpuHist, cpuTempHist, ramHist, gpuHist, gpuTempHist };
 
     } catch (error) {
         console.error("Errore durante il parsing del file XML:", error);
@@ -51,11 +58,22 @@ async function getLog() {
 
 async function updateLogs() {
     os.cpuUsage(async (v) => {
+        // CPU
         const cpu = (v * 100).toFixed(2);
+        const tempData = await si.cpuTemperature();
+        const cpuTemp = tempData.main || 0;
+        // RAM
         const totalRam = os.totalmem();
         const freeRam = os.freemem();
         const ram = (((totalRam - freeRam) / totalRam) * 100).toFixed(2);
-        const logLine = `${new Date().toISOString()},${cpu},${ram}`;
+        // GPU
+        const gpu = await si.graphics();
+        const mainGpu = gpu.controllers[0];
+
+        const gpuLoad = mainGpu.utilizationGpu?.toFixed(2) || "0.00"; 
+        const gpuTemp = mainGpu.temperatureGpu || "No Data";
+
+        const logLine = `${new Date().toISOString()},${cpu},${cpuTemp},${ram},${gpuLoad},${gpuTemp}`;
 
         try {
             let lines = [];
@@ -73,7 +91,7 @@ async function updateLogs() {
 
             await fs.writeFile(logPath, lines.join("\n") + "\n");
             
-            console.log(`[Log] Saved (CPU: ${cpu} | RAM: ${ram})`);
+            console.log(`[Log] Saved (CPU: ${cpu}%, ${cpuTemp}° | RAM: ${ram}% | GPU: ${gpuLoad}%, ${gpuTemp}°)`);
         } catch (err) {
             console.error("Errore gestione log:", err.message);
         }
