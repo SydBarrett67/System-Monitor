@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title><%= title %></title>
+    <style>
+        body {
+            background-color: #000;
+            color: #00ff00;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            margin: 0;
+            padding: 15px;
+            font-size: 14px;
+            line-height: 1.2;
+        }
+
+        /* --- PULSANTE HOME --- */
+        .home-btn {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            background: transparent;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            padding: 5px 15px;
+            text-decoration: none;
+            font-family: inherit;
+            font-size: 12px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .home-btn:hover {
+            background: #00ff00;
+            color: #000;
+            box-shadow: 0 0 10px #00ff00;
+            cursor: pointer;
+        }
+
+        #console {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            margin-top: 30px; /* Spazio per non sovrapporsi al pulsante su schermi piccoli */
+        }
+
+        #console::after {
+            content: "_";
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            from, to { opacity: 1; }
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="home-btn">[ ESCI_AL_DASHBOARD ]</a>
+
+    <div id="console"></div>
+
+    <script>
+        const consoleElem = document.getElementById('console');
+        const delay = parseInt("<%= delay %>") || 3000;
+
+        async function updateTerminal() {
+            try {
+                const response = await fetch('/api/getData');
+                const data = await response.json();
+
+                if (data && data.timestamps) {
+                    let rawLines = "";
+                    
+                    data.timestamps.forEach((time, i) => {
+                        // Formato: Timestamp, CPU, CPUTemp, RAM, GPU, GPUTemp, Disk, Net
+                        rawLines += `${time},${data.cpuHist[i]},${data.cpuTempHist[i]},${data.ramHist[i]},${data.gpuHist[i]},${data.gpuTempHist[i]},${data.diskHist[i]},${data.netHist[i]}\n`;
+                    });
+
+                    consoleElem.textContent = rawLines;
+
+                    // Autoscroll
+                    window.scrollTo(0, document.body.scrollHeight);
+                }
+            } catch (e) {
+                consoleElem.textContent += "\n[ERROR] Connection lost. Retrying...";
+            }
+        }
+
+        updateTerminal();
+        setInterval(updateTerminal, delay);
+    </script>
+</body>
+</html>

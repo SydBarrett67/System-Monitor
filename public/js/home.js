@@ -1,140 +1,116 @@
+let zoomChart = null;
+
+// --- 1. INIZIALIZZAZIONE CHART PICCOLE ---
+
+const cpuChart = new Chart(document.getElementById('cpuChart').getContext('2d'), {
+    type: 'line',
+    data: { labels: [], datasets: [{ label: 'CPU', data: [], borderColor: 'rgb(240, 240, 230)', borderWidth: 2, pointRadius: 0, tension: 0.4, fill: true, backgroundColor: 'rgba(240, 240, 230, 0.1)' }] },
+    options: { animation: false, responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false, min: 0, max: 100 } } }
+});
+
+const ramChart = new Chart(document.getElementById('ramChart').getContext('2d'), {
+    type: 'line',
+    data: { labels: [], datasets: [{ label: 'RAM', data: [], borderColor: 'rgb(240, 240, 230)', borderWidth: 2, pointRadius: 0, tension: 0.4, fill: true, backgroundColor: 'rgba(240, 240, 230, 0.1)' }] },
+    options: { animation: false, responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false, min: 0, max: 100 } } }
+});
+
+const gpuChart = new Chart(document.getElementById('gpuChart').getContext('2d'), {
+    type: 'line',
+    data: { labels: [], datasets: [{ label: 'GPU', data: [], borderColor: 'rgb(240, 240, 230)', borderWidth: 2, pointRadius: 0, tension: 0.4, fill: true, backgroundColor: 'rgba(240, 240, 230, 0.1)' }] },
+    options: { animation: false, responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false, min: 0, max: 100 } } }
+});
+
+const diskChart = new Chart(document.getElementById('diskChart').getContext('2d'), {
+    type: 'line',
+    data: { labels: [], datasets: [{ label: 'Disk', data: [], borderColor: 'rgb(240, 240, 230)', borderWidth: 2, pointRadius: 0, tension: 0.4, fill: true, backgroundColor: 'rgba(240, 240, 230, 0.1)' }] },
+    options: { animation: false, responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false, min: 0, max: 10 } } }
+});
+
+const netChart = new Chart(document.getElementById('netChart').getContext('2d'), {
+    type: 'line',
+    data: { labels: [], datasets: [{ label: 'Net', data: [], borderColor: 'rgb(240, 240, 230)', borderWidth: 2, pointRadius: 0, tension: 0.4, fill: true, backgroundColor: 'rgba(240, 240, 230, 0.1)' }] },
+    options: { animation: false, responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false, min: 0, max: 100 } } }
+});
+
+// --- 2. FUNZIONE ZOOM ---
+
+function activateZoom(chart, title) {
+    const zoomTitle = document.getElementById('zoom-title');
+    if (zoomTitle) zoomTitle.innerText = "Dettaglio: " + title;
+    
+    if (zoomChart) zoomChart.destroy();
+
+    const zoomCtx = document.getElementById('zoomChart').getContext('2d');
+    zoomChart = new Chart(zoomCtx, {
+        type: 'line',
+        data: chart.data, // Condivide l'oggetto data
+        options: {
+            animation: false,
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: true, labels: { color: '#fff' } } },
+            scales: {
+                x: { display: true, ticks: { color: '#888' } },
+                y: { 
+                    display: true, 
+                    min: chart.options.scales.y.min, 
+                    max: chart.options.scales.y.max,
+                    ticks: { color: '#888' }
+                }
+            }
+        }
+    });
+}
+
+// Eventi click (assicurati che gli ID esistano nell'HTML)
+document.getElementById('cpuChart').onclick = () => activateZoom(cpuChart, "CPU Usage");
+document.getElementById('ramChart').onclick = () => activateZoom(ramChart, "RAM Usage");
+document.getElementById('gpuChart').onclick = () => activateZoom(gpuChart, "GPU Usage");
+document.getElementById('diskChart').onclick = () => activateZoom(diskChart, "Disk Activity");
+document.getElementById('netChart').onclick = () => activateZoom(netChart, "Network Traffic");
+
+// --- 3. RECUPERO DATI ---
+
 async function getData() {
     try {
         const response = await fetch("/api/getData");
-
         const data = await response.json();
+        if (!data || !data.timestamps) return;
 
-        console.log("Dati ricevuti dal server:", data);
+        const labels = data.timestamps.map(() => '');
 
-        if (!data) return;
+        // Aggiornamento dati (questo aggiorna automaticamente anche lo zoom)
+        cpuChart.data.labels = labels;
+        cpuChart.data.datasets[0].data = data.cpuHist;
+        cpuChart.update('none');
 
-        // --- Aggiornamento CPU ---
-        if (data.cpuHist && data.cpuHist.length > 0) {
-            cpuChart.data.labels = data.cpuHist.map(() => '');
-            cpuChart.data.datasets[0].data = data.cpuHist;
-            cpuChart.update('none');
+        ramChart.data.labels = labels;
+        ramChart.data.datasets[0].data = data.ramHist;
+        ramChart.update('none');
+
+        gpuChart.data.labels = labels;
+        gpuChart.data.datasets[0].data = data.gpuHist;
+        gpuChart.update('none');
+
+        diskChart.data.labels = labels;
+        diskChart.data.datasets[0].data = data.diskHist;
+        diskChart.update('none');
+
+        netChart.data.labels = labels;
+        netChart.data.datasets[0].data = data.netHist;
+        netChart.update('none');
+
+        // Se lo zoom è attivo, ridisegnalo
+        if (zoomChart) {
+            zoomChart.update('none');
         }
 
-        // --- Aggiornamento RAM ---
-        if (data.ramHist && data.ramHist.length > 0) {
-            ramChart.data.labels = data.ramHist.map(() => '');
-            ramChart.data.datasets[0].data = data.ramHist;
-            ramChart.update('none');
-        }
-
-        // --- Aggiornamento GPU ---
-        if (data.gpuHist && data.gpuHist.length > 0) {
-            gpuChart.data.labels = data.gpuHist.map(() => '');
-            gpuChart.data.datasets[0].data = data.gpuHist; 
-            gpuChart.update('none');
-        }
-
-    } catch (e) {
-        console.error("Errore nel recupero dati API:", e.message);
-    }
+    } catch (e) { console.error("Errore fetch:", e); }
 }
 
 function start() {
-    getData()
-    setInterval(getData, refreshDelay)
+    getData();
+    setInterval(getData, 1000);
 }
 
-// Charts
-const cpuCtx = document.getElementById('cpuChart');
-const cpuChart = new Chart(cpuCtx, {
-    type: 'line',
-    data: {
-        labels: [], // Parti vuoto
-        datasets: [{
-            label: 'CPU Usage (%)',
-            data: [], // Parti vuoto
-            borderColor: 'rgb(240, 240, 230)',
-            borderWidth: 2,
-            pointRadius: 0,
-            tension: 0.4,
-            fill: true,
-            backgroundColor: 'rgba(240, 240, 230, 0.1)'
-        }]
-    },
-    options: {
-        animation: false, // Disabilita animazioni per un look da "monitor in tempo reale"
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-            x: { display: false }, 
-            y: { 
-                display: false, 
-                min: 0, 
-                max: 100,
-                beginAtZero: true 
-            }
-        }
-    }
-});
-
-const ramCtx = document.getElementById('ramChart');
-const ramChart = new Chart(ramCtx, {
-    type: 'line',
-    data: {
-        labels: [], // Parti vuoto
-        datasets: [{
-            label: 'RAM Usage (%)',
-            data: [], // Parti vuoto
-            borderColor: 'rgb(240, 240, 230)',
-            borderWidth: 2,
-            pointRadius: 0,
-            tension: 0.4,
-            fill: true,
-            backgroundColor: 'rgba(240, 240, 230, 0.1)'
-        }]
-    },
-    options: {
-        animation: false, // Disabilita animazioni per un look da "monitor in tempo reale"
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-            x: { display: false }, 
-            y: { 
-                display: false, 
-                min: 0, 
-                max: 100,
-                beginAtZero: true 
-            }
-        }
-    }
-});
-
-const gpuCtx = document.getElementById('gpuChart');
-const gpuChart = new Chart(gpuCtx, {
-    type: 'line',
-    data: {
-        labels: [], // Parti vuoto
-        datasets: [{
-            label: 'GPU Usage (%)',
-            data: [], // Parti vuoto
-            borderColor: 'rgb(240, 240, 230)',
-            borderWidth: 2,
-            pointRadius: 0,
-            tension: 0.4,
-            fill: true,
-            backgroundColor: 'rgba(240, 240, 230, 0.1)'
-        }]
-    },
-    options: {
-        animation: false, // Disabilita animazioni per un look da "monitor in tempo reale"
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-            x: { display: false }, 
-            y: { 
-                display: false, 
-                min: 0, 
-                max: 100,
-                beginAtZero: true 
-            }
-        }
-    }
-});
+start();

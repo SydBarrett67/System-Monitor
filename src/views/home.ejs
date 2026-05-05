@@ -27,13 +27,26 @@
             </div>
             <div class="dashboard-element">
                 <span>Ethernet</span>
-                <canvas id="bandChart"></canvas>
+                <canvas id="netChart"></canvas>
             </div>
         </nav>
         
         <main class="content">
             <h1><%= greeting %></h1>
+            <div id="zoom-container" style="flex-grow: 1; min-height: 400px; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                <h3 id="zoom-title" style="color: #888; margin-top: 0;">Seleziona un grafico per lo zoom</h3>
+                <canvas id="zoomChart"></canvas>
+            </div>
         </main>
+
+        <div class="nav-container">
+            <a href="/exportPage" class="nav-btn">
+                <span style="margin-right: 6px;"></span> Esporta Logs
+            </a>
+            <a href="/log" class="nav-btn">
+                <span style="margin-right: 6px;"></span> Visualizza Logs
+            </a>
+        </div>
     </div>
 
 

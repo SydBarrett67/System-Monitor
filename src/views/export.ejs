@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <style>
+        body { 
+            background: rgba(50,50,50,0.9); /* Sfondo ancora più chiaro e caldo */
+            color: #5a5a54; 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            height: 100vh; 
+            margin: 0; 
+        }
+
+        .container { 
+            background: #ffffff; 
+            padding: 60px; 
+            border-radius: 20px; 
+            box-shadow: 0 15px 40px rgba(0,0,0,0.03); 
+            text-align: center; 
+            border: 1px solid #f0f0e8;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        h1 { 
+            color: #7d7d73; 
+            font-weight: 300; 
+            margin-top: 0;
+            margin-bottom: 40px; 
+            font-size: 1.5rem;
+        }
+
+        .btn-group { 
+            display: flex; 
+            gap: 15px; 
+            justify-content: center; /* CENTRA I BOTTONI ORIZZONTALMENTE */
+            align-items: center;    /* CENTRA I BOTTONI VERTICALMENTE */
+        }
+
+        .export-btn { 
+            background: rgb(245, 245, 240); /* Colore crema dei tuoi grafici */
+            color: #6d6d66; 
+            border: 1px solid #e0e0d5; 
+            padding: 12px 0; /* Altezza fissa */
+            width: 100px;    /* Larghezza fissa per simmetria */
+            text-decoration: none; 
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center; /* CENTRA IL TESTO DENTRO IL BOTTONE */
+        }
+
+        .export-btn:hover { 
+            background: #ebebe0; 
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            color: #444;
+        }
+
+        .back-btn { 
+            display: inline-block; 
+            margin-top: 40px; 
+            color: #b0b0a5; 
+            text-decoration: none; 
+            font-size: 13px;
+            transition: color 0.2s;
+        }
+
+        .back-btn:hover { 
+            color: #7d7d73; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Scegli il formato di esportazione</h1>
+
+        <div class="btn-group">
+            <button onclick="downloadLog('csv', this)" class="export-btn">CSV</button>
+            <button onclick="downloadLog('json', this)" class="export-btn">JSON</button>
+            <button onclick="downloadLog('xml', this)" class="export-btn">XML</button>
+        </div>
+        <a href="/" class="back-btn">← Torna alla Dashboard</a>
+    </div>
+
+    <script src="/js/export.js" defer></script>
+</body>
+</html>
