@@ -2,11 +2,11 @@
 <configuration>
     <homePage>
         <title>Home page - System Monitor</title>
-        <!-- <theme>dark</theme> -->
         <msg>System Monitor</msg>
     </homePage>
 
     <systemSettings>
         <delay>1000</delay>
+        <maxLogLines>120</maxLogLines>
     </systemSettings>
 </configuration>

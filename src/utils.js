@@ -7,7 +7,7 @@ const si = require("systeminformation");
 const configPath = path.join(__dirname, "data", "config.xml");
 const logPath = path.join(__dirname, "data", "userLog.csv");
 
-const maxLogLines = 60; // Limite righe CSV
+let maxLogLines = 60; // Limite righe CSV
 
 // Valori precedenti per calcolo delta
 let lastRead = 0;
@@ -22,6 +22,7 @@ async function parseConfig() {
         const xmlData = (await fs.readFile(configPath, "utf-8")).trim();
         const parser = new xml2js.Parser({ explicitArray: false });
         const result = await parser.parseStringPromise(xmlData);
+        maxLogLines = parseInt(result.configuration.maxLogLines) || maxLogLines;
         return result.configuration;
     } catch (error) {
         console.error("Errore XML:", error);
